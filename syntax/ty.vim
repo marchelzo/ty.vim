@@ -6,9 +6,9 @@ if exists("b:current_syntax")
 endif
 
 syn case match
-syn keyword tyKeyword let pub function macro import export defer _
+syn keyword tyKeyword let pub function class tag macro import export defer _
 syn keyword tyBranch for return break continue yield
-syn keyword tyConditional if else match switch
+syn keyword tyConditional if else match switch try catch finally
 " syn keyword tyBuiltin type  alloc assert append abort delete insert
 " syn keyword tyBuiltin vastart vaarg vaend
 syn keyword tyOperator in not and or
