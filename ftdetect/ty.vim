@@ -1,1 +1,1 @@
-au BufRead,BufNewFile *.ty set filetype=hare
+au BufRead,BufNewFile *.ty set filetype=ty

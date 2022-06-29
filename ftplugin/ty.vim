@@ -21,5 +21,5 @@ setlocal commentstring=//\ %s
 " and insert the comment leader when hitting <CR> or using "o".
 setlocal fo-=t fo+=croql
 
-compiler hare
+compiler ty
 " vim: tabstop=2 shiftwidth=2 expandtab
