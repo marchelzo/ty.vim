@@ -64,10 +64,12 @@ syn match tyNumber /-\?\%(0x\)\?\d\+\%(\.\d\+\)\?/
 syn region tyRawString start=+'+ skip=+\\'+ end=+'+
 syn region tySpecialString start=+"+ skip=+\\"+ end=+"+
 
-syn match tyCall /\w\+[!?]\?(\@=/
+syn match tyCall /[a-z_]\w*[!?]\?(\@=/
+syn match tyType /[A-Z]\w*(\@!/
+syn match tyCtor /[A-Z]\w*(\@=/
 
 
-syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyKeyword,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString
+syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyKeyword,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor
 syntax cluster tyStatement contains=@tyExpression,tyBlock
 
 hi link tyImport             Include
@@ -80,8 +82,8 @@ hi link tyNil                Constant
 hi link tyNumber             Constant
 hi link tyPub                StorageClass
 hi link tyClass              Structure
-hi link tyClassName          Identifier
-hi link tySuperName          Identifier
+hi link tyClassName          Type
+hi link tySuperName          Type
 hi link tyMethodName         Function
 hi link tyCall               Function
 hi link tyLet                StorageClass
@@ -89,6 +91,8 @@ hi link tyKeyword            Keyword
 hi link tyParam              Special
 hi link tyOperator           Operator
 hi link tyInstanceVar        Identifier
-hi link tySelf               Special
+hi link tySelf               Orange
 hi link tyRawString          String
 hi link tySpecialString      String
+hi link tyType               Type
+hi link tyCtor               Type
