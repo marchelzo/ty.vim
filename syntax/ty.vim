@@ -116,6 +116,13 @@ hi link tySelf               Constant
 hi link tyString             String
 hi link tySpecial            Special
 hi link tyRegexpString       String
+hi link tyRegexpBoundary     SpecialChar
+hi link tyRegexpQuantifier   SpecialChar
+hi link tyRegexpOr           Conditional
+hi link tyRegexpMod          SpecialChar
+hi link tyRegexpBackRef      SpecialChar
+hi link tyRegexpGroup        tyRegexpString
+hi link tyRegexpCharClass    Character
 hi link tyType               Type
 hi link tyCtor               Type
 hi link tyComment            Comment
