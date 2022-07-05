@@ -33,7 +33,7 @@ syn keyword tyImport contained import skipwhite nextgroup=tyModPath
 syn match   tyModPath contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite nextgroup=tyAs,tyImportList,tyNewline
 syn keyword tyAs contained as skipwhite nextgroup=tyModAlias
 syn region  tyImportList contained start=/(/ end=/)/ contains=tyIdentifier skipwhite nextgroup=tyNewline
-syn region  tyImportStatement start=/\%(import\)\@=/ end=/\n/ contains=tyImport
+syn region  tyImportStatement start=/\%(\<import\>\)\@=/ end=/\n/ contains=tyImport
 
 syn keyword tyBool true false
 syn keyword tyPub pub
