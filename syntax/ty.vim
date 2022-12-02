@@ -57,7 +57,7 @@ syn match   tyParamDefault contained '=' skipwhite skipempty nextgroup=@tyExpres
 syn region tyBlock contained matchgroup=tyBraces start=/{/  end=/}/  contains=@tyStatement,tyBlock extend fold
 
 syn keyword tyNil nil
-syn keyword tyKeyword let pub function match while for if else try catch finally throw return in not and or yield break continue macro operator
+syn keyword tyKeyword with let pub function match while for if else try catch finally throw return in not and or yield break continue macro operator
 syn match   tyOperator /\%(#\)\|\%([<>=/%+*^&!:.|-]\+\)/
 
 " syn match tyNumber /-\?\%(0x\)\?\d\+\%(\.\d\+\)\?/
