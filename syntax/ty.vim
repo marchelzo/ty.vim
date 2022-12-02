@@ -90,7 +90,7 @@ syntax region  tyEnvComment     start=/\%^#!/ end=/$/ display
 syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyKeyword,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyComment
 syntax cluster tyStatement contains=@tyExpression,tyBlock,tyEnvComment
 
-syntax region  tyString           start=+\z(["']\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ end=+$+  contains=tySpecial extend
+syntax region  tyString           start=+\z(["']\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial extend
 syntax match   tyNumber           /\c\<\%(\d\+\%(e[+-]\=\d\+\)\=\|0b[01]\+\|0o\o\+\|0x\%(\x\|_\)\+\)n\=\>/
 
 hi link tyImport             Include
