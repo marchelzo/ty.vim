@@ -44,7 +44,7 @@ syn match   tyClassName contained /\w\+/ skipwhite skipempty nextgroup=tyTagSemi
 syn match   tyExtend contained /:/ skipwhite skipempty nextgroup=tySuperName
 syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock
 syn match   tyTagSemicolon contained /;/
-syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyMethodName,tyComment
+syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyMethodName,tyComment,tyKeyword
 syn match   tyMethodName contained /\%(\w\+[!?=]\?\)\|\%([/<>=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
 syn match   tyInstanceVar contained /@\w\+[!?]\?/ containedin=tyClassBlock
 syn keyword tySelf contained self containedin=tyClassBlock
@@ -57,7 +57,7 @@ syn match   tyParamDefault contained '=' skipwhite skipempty nextgroup=@tyExpres
 syn region tyBlock contained matchgroup=tyBraces start=/{/  end=/}/  contains=@tyStatement,tyBlock extend fold
 
 syn keyword tyNil nil
-syn keyword tyKeyword with let pub function generator match while for if else try catch finally throw return in not and or yield break continue macro operator
+syn keyword tyKeyword with let pub function generator match while for if else try catch finally throw return in not and or yield break continue macro operator static
 syn match   tyOperator /\%(#\)\|\%([<>=/%+*^&!:.|-]\+\)/
 
 " syn match tyNumber /-\?\%(0x\)\?\d\+\%(\.\d\+\)\?/
