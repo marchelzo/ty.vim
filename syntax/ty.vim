@@ -45,7 +45,7 @@ syn match   tyExtend contained /:/ skipwhite skipempty nextgroup=tySuperName
 syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock
 syn match   tyTagSemicolon contained /;/
 syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyMethodName,tyComment
-syn match   tyMethodName contained /\%(\w\+[!?]\?\)\|\%([/<>=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList
+syn match   tyMethodName contained /\%(\w\+[!?=]\?\)\|\%([/<>=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
 syn match   tyInstanceVar contained /@\w\+[!?]\?/ containedin=tyClassBlock
 syn keyword tySelf contained self containedin=tyClassBlock
 
