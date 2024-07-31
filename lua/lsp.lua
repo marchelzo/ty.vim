@@ -14,7 +14,7 @@ local function start()
     -- From there we can point correctly to the LSP server.
     -- local ls_path = vim.fn.resolve(plugin_dir .. '/../vscode/out/server/src/server.js')
 
-	local ls_path = '/home/brad/ty/tyd.ty'
+	local ls_path = '/usr/local/bin/tyd'
 
     -- We need the file to be readable by node, otherwise we'll warn the user
     -- and keep going without the client.
