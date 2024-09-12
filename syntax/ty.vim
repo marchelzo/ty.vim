@@ -28,11 +28,12 @@ syn match   tyIdentifier /\w\+[!?]\?/
 
 " Modules
 syn match   tyNewline contained /\n\|$/
-syn match   tyModAlias contained /\w\+[!?]\?/ skipwhite nextgroup=tyImportList,tyNewline
+syn match   tyModAlias contained /\w\+[!?]\?/ skipwhite nextgroup=tyImportList,tyNewline,tyHiding
 syn keyword tyImport contained import skipwhite nextgroup=tyModPath
-syn match   tyModPath contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite nextgroup=tyAs,tyImportList,tyNewline
+syn match   tyModPath contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite nextgroup=tyAs,tyImportList,tyNewline,tyHiding
 syn keyword tyAs contained as skipwhite nextgroup=tyModAlias
-syn region  tyImportList contained start=/(/ end=/)/ contains=tyIdentifier skipwhite nextgroup=tyNewline
+syn keyword tyHiding contained hiding skipwhite nextgroup=tyImportList
+syn region  tyImportList contained start=/(/ end=/)/ contains=tyIdentifier,tyAs skipwhite nextgroup=tyNewline
 syn region  tyImportStatement start=/\%(\<import\>\)\@=/ end=/\n/ contains=tyImport
 
 syn keyword tyBool true false
@@ -95,6 +96,7 @@ syntax match   tyNumber           /\c\<\%(\d\+\%(e[+-]\=\d\+\)\=\|0b[01]\+\|0o\o
 
 hi link tyImport             Include
 hi link tyAs                 Keyword
+hi link tyHiding             Keyword
 hi link tyModPath            YellowItalic
 hi link tyModAlias           YellowItalic
 hi link tyIdentifier         Identifier
