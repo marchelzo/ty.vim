@@ -13,7 +13,7 @@ endif
 " Dollar sign is permitted anywhere in an identifier
 if (v:version > 704 || v:version == 704 && has('patch1142')) && main_syntax == 'ty'
   "syntax iskeyword @,48-57,_,192-255,$,?,!,|,&,:,<,>,@-@,-
-  syntax iskeyword @,48-57,_,192-255,$,?,!,|,&,:,@-@,-
+  syntax iskeyword @,48-57,_,192-255,$,?,!,~,|,&,:,@-@
 else
   setlocal iskeyword+=$
   setlocal iskeyword+=?
@@ -41,7 +41,7 @@ syn keyword tyBool true false
 syn keyword tyPub pub
 
 syn keyword tyFunction function skipwhite skipempty nextgroup=tyFunctionName
-syn match   tyFunctionName contained /\%(\w\%(\w\|-\w\)\+[!?=]\?\)\|\%([/<>=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
+syn match   tyFunctionName contained /\%(\w\%(\w\|-\w\)\+[!?=]\?[*]\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
 
 " Classes / Tags
 syn keyword tyClass class tag skipwhite skipempty nextgroup=tyClassName
@@ -50,7 +50,7 @@ syn match   tyExtend contained /:/ skipwhite skipempty nextgroup=tySuperName
 syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock
 syn match   tyTagSemicolon contained /;/
 syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyMethodName,tyComment,tyKeyword
-syn match   tyMethodName contained /\%(\w\%(\w\|-\w\)\+[!?=]\?\)\|\%([/<>=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
+syn match   tyMethodName contained /\%(\w\%(\w\|-\w\)\+[!?=]\?\*\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
 syn match   tyInstanceVar contained /@\w\%(\w\|-\)*[!?]\?/ containedin=tyClassBlock
 syn keyword tySelf contained self containedin=tyClassBlock
 

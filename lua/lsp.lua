@@ -34,7 +34,7 @@ local function start()
   end
   -- Attach our LSP client handle to the current buffer. 
   -- See :help lsp and search for `buf_attach_client` for more info.
-  require('vim.lsp.log').set_level('TRACE')
+  -- require('vim.lsp.log').set_level('TRACE')
   -- vim.lsp.log.set_level('TRACE')
   vim.lsp.buf_attach_client(0, client)
 end
