@@ -26,7 +26,7 @@ syntax sync fromstart
 syntax case match
 
 syn keyword tyFunction fn function skipwhite skipempty nextgroup=tyFunctionName
-syn match   tyFunctionName contained /\%(\w\%(\w\|-\w\)*[!?=]\?[*]\=\)\|\%([/<>#~=+%?*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
+syn match   tyFunctionName contained /\%(\w\%(\w\|-\w\)*[!?=]\?[*]\=\)\|\%([/<>#~=+%?*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyFunctionTypeParams,tyParamList,@tyStatement
 
 syn region  tyParenthesizedExpression matchgroup=tyGroupParen start=/(/ end=/)/ transparent contains=@tyExpression
 
@@ -37,7 +37,7 @@ syn match  tyQQSpliceVar /\$\$\K\k*/
 
 let ident = '\%(\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\|\$\d\+\)'
 
-syn match   tySemicolon /;/
+syn match   tySemicolon /;/ contained
 syn match   tyOperator /\%(#\)\|?\|\%([~<>=/%+*^&!:.|-]\)\+/
 execute "syn match   tyIdentifier /" .. ident .. "/ contains=tyModAccess,tyCall,tyType,tyCtor,tyModName"
 syn match   tyCall /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?(\)\@=/ contains=tyModAccess,tyType,tyCtor nextgroup=tyArgList,tyPartialApp
@@ -52,34 +52,41 @@ syn match tyNotNil /\$[A-z_]\@=/ contained nextgroup=tyIdentifier
 " Modules
 syn match   tyNewline contained /\n\|$/
 syn match   tyModAlias contained /\w\+[!?]\?/ skipwhite nextgroup=tyImportList,tyNewline,tyHiding
-syn keyword tyImport contained import use skipwhite nextgroup=tyModPath
+syn keyword tyImport contained import skipwhite nextgroup=tyModPath
 syn match   tyModPath contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite nextgroup=tyAs,tyImportList,tyNewline,tyHiding
 syn keyword tyAs contained as skipwhite nextgroup=tyModAlias
 syn keyword tyHiding contained hiding skipwhite nextgroup=tyImportList
 syn region  tyImportList contained start=/(/ end=/)/ contains=tyIdentifier,tyAs skipwhite nextgroup=tyNewline
-syn region  tyImportStatement start=/\%(\<import\|use\>\)\@=/ end=/\n/ contains=tyImport
+syn region  tyImportStatement start=/\%(\<import\>\)\@=/ end=/\n/ contains=tyImport
+
+syn keyword tyUse use skipwhite nextgroup=tyModPath,tyType
 
 syn keyword tyBool true false
 syn keyword tyPub pub
 
 " Classes / Tags
 syn keyword tyClass trait class tag skipwhite skipempty nextgroup=tyClassName
-syn match   tyClassName contained /\w\+/ skipwhite skipempty nextgroup=tyClassParams,tyTagSemicolon,tyClassBlock,tyExtend,tyTraitList
+syn match   tyClassName contained /\w\+/ skipwhite skipempty nextgroup=tyClassParams,tyClassTypeParams,tyTagSemicolon,tyClassBlock,tyExtend,tyTraitList
 syn match   tyExtend contained /</ skipwhite skipempty nextgroup=tySuperName
 syn region  tyTraitList contained start=/:/ end=/{\@=/ keepend contains=@tyExpression skipwhite skipempty nextgroup=tyClassBlock
 syn match   tyTrait contained /\%(\*\|%\)\?\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint
 syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock,tyTraitList
 syn match   tyTagSemicolon contained /;/
-syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyMethodName,tyComment,tyKeyword,tyDecorator,tyDecoratorMacro
-syn match   tyMethodName contained /\%(\w\%(\w\|-\w\)*[!?=]\?\*\=\)\|\%(\s[/<>#~=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyParamList,@tyStatement
+syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyField,tyMethodName,tyComment,tyKeyword,tyDecorator,tyDecoratorMacro
+syn match   tyMethodName contained /\%(\w\%(\w\|-\w\)*[!?=]\?\*\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyMethodTypeParams,tyParamList,@tyStatement
+syn match   tyField contained /\w\%(\w\|-\w\)\{-}[!?]\?\s*:/he=e-1 skipwhite skipempty nextgroup=@tyExpression
 syn match   tyInstanceVar contained /@\w\%(\w\|-\)*[!?]\?/ containedin=tyClassBlock
 syn match   tySelf contained /\%(\K-\)\@<!\%(self\|super\)\K\@!/ containedin=tyClassBlock
 "syn keyword tySelf self contained containedin=tyClassBlock
 "syn match   tySelf contained /<self\>/ containedin=tyClassBlock
 
+syn region tyClassTypeParams contained skipwhite matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ keepend contains=@tyExpression nextgroup=tyClassParams,tyExtend,tyTraitList,tyClassBlock
+syn region tyMethodTypeParams contained matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ contains=@tyExpression nextgroup=tyParamList
+syn region tyFunctionTypeParams contained matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ contains=@tyExpression nextgroup=tyParamList
+
 syn region  tyClassParams matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma skipwhite skipempty nextgroup=tyClassBlock,tyExtend,tyTraitList
 
-syn region  tyParamList matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma skipwhite skipempty nextgroup=@tyStatement
+syn region  tyParamList matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma,tyComment skipwhite skipempty nextgroup=tyReturnType,@tyStatement
 syn match   tyComma contained /,/ skipwhite skipempty
 syn match   tyParam contained /\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 syn match   tyGatherParam contained /\*\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
@@ -88,6 +95,7 @@ syn match   tyKwargsParam contained /%\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty
 syn match tyParamConstraint contained /:/ skipwhite nextgroup=@tyExpresion
 "syn region  tyParamDefault contained start='=' end=/{\|,/ skipwhite skipempty contains=@tyExpression
 syn match tyParamDefault contained /=/ skipwhite nextgroup=@tyExpression
+syn region tyReturnType start=/->/ end=/\%({\|;\)\@=/ skipwhite skipempty transparent contains=@tyExpression nextgroup=@tyStatement
 
 syn region tyRecord contained matchgroup=tyRecordBracket start=/{/ end=/}/ contains=@tyExpression extend
 syn region tyBlock contained matchgroup=tyBraces start=/{/  end=/}/  contains=@tyStatement,tyBlock extend fold
@@ -114,7 +122,7 @@ syn region  tyCtorArgList matchgroup=tyCtorArgListParen start=/(/ end=/)/ contai
 syn match   tyComma contained /,/ skipwhite skipempty
 "syn match   tyArg contained /\%(\*\|%\)\?\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 
-syn match tyType /\K\@<![A-Z]\w*\%(\K\)\@!/
+syn match tyType /\K\@<![A-Z]\w*\%(\K\)\@!/ nextgroup=tyClassTypeParams
 syn match tyCtor /\K\@<![A-Z]\w*\%(@\?(\)\@=/ nextgroup=tyCtorPartialApp,tyCtorArgList
 
 " Regular Expressions
@@ -141,9 +149,11 @@ syntax region  tyComment        start=+//+ end=/$/ contains=tyCommentTodo,@Spell
 syntax region  tyComment        start=+/\*+  end=+\*/+ contains=tyCommentTodo,@Spell fold extend keepend
 syntax region  tyEnvComment     start=/\%^#!/ end=/$/ display
 
-syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyMemberAccess,tyKeyword,tyFunction,tyNil,tySemicolon,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo
+syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyMemberAccess,tyKeyword,tyFunction,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo,tySemicolon
 
-syntax cluster tyStatement contains=@tyExpression,tyBlock,tyEnvComment
+syntax cluster tyStatement contains=@tyExpression,tyBlock,tyEnvComment,tyUse,tyNullStatement
+
+syntax match tyNullStatement /;/ skipempty skipwhite contained
 
 syntax region  tyString           start=+\z([']\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial extend
 syntax region  tySpecialString    start=+\z(["]\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial,tyTemplateExpression extend
@@ -168,7 +178,9 @@ hi link tyHiding              Keyword
 hi link tyModPath             YellowItalic
 hi link tyModAlias            YellowItalic
 hi link tyModName             YellowItalic
+hi link tyUse                 Include
 hi link tyIdentifier          Normal
+hi link tyField               Identifier
 hi link tyModAccess           Conceal
 hi link tyBool                Boolean
 hi link tyNil                 Constant
@@ -214,6 +226,7 @@ hi link tyRegexpBackRef       SpecialChar
 hi link tyRegexpGroup         tyRegexpString
 hi link tyRegexpCharClass     Character
 hi link tyType                Type
+hi link tyTypeParamsBracket   Normal
 hi link tyCtor                Type
 hi link tyComment             Comment
 hi link tyEnvComment          Comment
@@ -235,4 +248,5 @@ hi link tyGroupParen       Normal
 hi link tyArrayBracket     Normal
 hi link tyDictBracket      Operator
 hi link tySemicolon        Grey
+hi link tyNullStatement    Grey
 hi link tyKwArg            Identifier
