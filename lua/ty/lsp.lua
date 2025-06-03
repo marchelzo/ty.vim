@@ -1,13 +1,11 @@
 local M = {}
 
 function M.setup()
-  local lspconfig = require('lspconfig')
-
   vim.lsp.config('tyd', {
     cmd = { '/usr/local/bin/tyd' },
     filetypes = { 'ty' },
     root_dir = function (bufnr, cb)
-      cb(lspconfig.util.find_git_ancestor('.') or vim.loop.cwd())
+      cb(vim.loop.cwd())
     end,
     settings = {},
     on_attach = function(client, bufnr)
