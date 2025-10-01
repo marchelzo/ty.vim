@@ -70,10 +70,10 @@ syn match   tyClassName contained /\w\+/ skipwhite skipempty nextgroup=tyClassPa
 syn match   tyExtend contained /</ skipwhite skipempty nextgroup=tySuperName
 syn region  tyTraitList contained start=/:/ end=/{\@=/ keepend contains=@tyExpression skipwhite skipempty nextgroup=tyClassBlock
 syn match   tyTrait contained /\%(\*\|%\)\?\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint
-syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock,tyTraitList
+syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock,tyTraitList,tyClassTypeParams
 syn match   tyTagSemicolon contained /;/
 syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyField,tyMethodName,tyComment,tyKeyword,tyDecorator,tyDecoratorMacro
-syn match   tyMethodName contained /\%(\w\%(\w\|-\w\)*[!?=]\?\*\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyMethodTypeParams,tyParamList,@tyStatement
+syn match   tyMethodName contained /\%(`\=\w\%(\w\|-\w\)*[!?=]\?\*\=`\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)\|\[;;\]\|\[\]/ skipwhite skipempty nextgroup=tyMethodTypeParams,tyParamList,tyReturnType,@tyStatement
 syn match   tyField contained /\w\%(\w\|-\w\)\{-}[!?]\?\s*:/he=e-1 skipwhite skipempty nextgroup=@tyExpression
 syn match   tyInstanceVar contained /@\w\%(\w\|-\)*[!?]\?/ containedin=tyClassBlock
 syn match   tySelf contained /\%(\K-\)\@<!\%(self\|super\)\K\@!/ containedin=tyClassBlock
@@ -86,7 +86,7 @@ syn region tyFunctionTypeParams contained matchgroup=tyTypeParamsBracket start=/
 
 syn region  tyClassParams matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma skipwhite skipempty nextgroup=tyClassBlock,tyExtend,tyTraitList
 
-syn region  tyParamList matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma,tyComment skipwhite skipempty nextgroup=tyReturnType,@tyStatement
+syn region  tyParamList matchgroup=tyParamListParen contained start=/(/ end=/)/ contains=tyParam,tyGatherParam,tyKwargsParam,tyParamDefault,tyComma,tyComment,@tyExpression skipwhite skipempty nextgroup=tyReturnType,@tyStatement
 syn match   tyComma contained /,/ skipwhite skipempty
 syn match   tyParam contained /\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 syn match   tyGatherParam contained /\*\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
