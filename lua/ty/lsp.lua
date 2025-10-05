@@ -21,9 +21,6 @@ function M.setup()
       end
     end,
   })
-
-  vim.lsp.set_log_level('TRACE')
-
 end
 
 return M
