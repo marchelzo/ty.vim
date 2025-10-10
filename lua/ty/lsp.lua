@@ -2,7 +2,7 @@ local M = {}
 
 function M.setup()
   vim.lsp.config('tyd', {
-    cmd = { '/usr/local/bin/tyd' },
+    cmd = { 'tyd' },
     filetypes = { 'ty' },
     root_dir = function (bufnr, cb)
       cb(vim.loop.cwd())
