@@ -80,7 +80,7 @@ syn match   tySelf contained /\%(\K-\)\@<!\%(self\|super\)\K\@!/ containedin=tyC
 "syn keyword tySelf self contained containedin=tyClassBlock
 "syn match   tySelf contained /<self\>/ containedin=tyClassBlock
 
-syn region tyClassTypeParams contained skipwhite matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ keepend contains=@tyExpression nextgroup=tyClassParams,tyExtend,tyTraitList,tyClassBlock
+syn region tyClassTypeParams contained skipwhite matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ contains=@tyExpression nextgroup=tyClassParams,tyExtend,tyTraitList,tyClassBlock
 syn region tyMethodTypeParams contained matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ contains=@tyExpression nextgroup=tyParamList
 syn region tyFunctionTypeParams contained matchgroup=tyTypeParamsBracket start=/\[/ end=/]/ contains=@tyExpression nextgroup=tyParamList
 
@@ -101,7 +101,7 @@ syn region tyRecord contained matchgroup=tyRecordBracket start=/{/ end=/}/ conta
 syn region tyBlock contained matchgroup=tyBraces start=/{/  end=/}/  contains=@tyStatement,tyBlock extend fold
 
 syn keyword tyNil nil
-syn keyword tyKeyword with let pub generator while for if else try catch finally throw return in not and or yield break continue macro operator static defer as namespace ns
+syn keyword tyKeyword with let const pub generator while for if else try catch finally throw return in not and or yield break continue macro operator static defer as namespace ns
 
 execute 'syn match tyMemberAccess /\%(\%([])"' .. "'" .. '} ]\|\k\)\.\)\@<=' .. ident .. '\%(\k\|(\)\@!/'
 
@@ -162,7 +162,7 @@ syntax match   tyNumber           /\c\%(\<\|[!?]\@<=\)-\=\%(\d[0-9_]*\%(e[+-]\=\
 syntax region  tyDocString           start=+\z('''\+\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial extend
 syntax region  tyDocSpecialString    start=+\z("""\+\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial,tyTemplateExpression extend
 
-syn region tyDecorator      matchgroup=tyDecoratorBracket start=/@\[/ end=/\]/ contains=tyDecoratorName,@tyExpression extend
+syn region tyDecorator      matchgroup=tyDecoratorSymbol start=/@/ end=/$/ contains=tyDecoratorName,@tyExpression extend
 syn region tyDecoratorMacro matchgroup=tyDecoratorMacroBracket start=/@{/  end=/}/  contains=tyDecoratorMacroName,@tyExpression extend
 
 syn match  tyDecoratorName /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?/ contained contains=tyModAccess nextgroup=tyDecoratorArgList,tyDecoratorPartialApp
@@ -235,7 +235,7 @@ hi link tyQuasiQuote          PreProc
 hi link tyQQSplice            PreProc
 hi link tyQQSpliceVar         Identifier
 
-hi link tyDecoratorBracket      Macro
+hi link tyDecoratorSymbol       Macro
 hi link tyDecoratorName         Macro
 hi link tyDecoratorMacroBracket Macro
 hi link tyDecoratorMacroName    Macro
