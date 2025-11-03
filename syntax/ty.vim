@@ -73,8 +73,10 @@ syn match   tyTrait contained /\%(\*\|%\)\?\w\%(\w\|-\w\)*[!?]\?/ skipwhite skip
 syn match   tySuperName contained /\w\+\%(\%(::\|\.\)\w\+\)*/ skipwhite skipempty nextgroup=tyTagSemicolon,tyClassBlock,tyTraitList,tyClassTypeParams
 syn match   tyTagSemicolon contained /;/
 syn region  tyClassBlock contained start=/{/ end=/}/ contains=tyField,tyMethodName,tyComment,tyKeyword,tyDecorator,tyDecoratorMacro
-syn match   tyMethodName contained /\%(`\=\w\%(\w\|-\w\)*[!?=]\?\*\=`\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)\|\[;;\]\|\[\]/ skipwhite skipempty nextgroup=tyMethodTypeParams,tyParamList,tyReturnType,@tyStatement
-syn match   tyField contained /\w\%(\w\|-\w\)\{-}[!?]\?\s*:/he=e-1 skipwhite skipempty nextgroup=@tyExpression
+syn match   tyMethodName contained /\%(`\=\w\%(\w\|-\w\)*[!?=]\?\*\=`\=\)\|\%([/<>#~=+%*^&!:.|-]\+\)\|\[;;\]\|\[\]\|?/ skipwhite skipempty nextgroup=tyMethodTypeParams,tyParamList,tyReturnType,@tyStatement
+syn region  tyField contained start=/\(static\s\)\=\w\%(\w\|-\w\)\{-}[!?]\?\s*:/me=e-1 end=/$/ skipwhite skipempty contains=tyFieldType,tyFieldInit,tyKeyword,@tyExpression
+syn match   tyFieldType contained /:/ skipwhite nextgroup=@tyExpression
+syn match   tyFieldInit contained /=/ skipwhite nextgroup=@tyExpression
 syn match   tyInstanceVar contained /@\w\%(\w\|-\)*[!?]\?/ containedin=tyClassBlock
 syn match   tySelf contained /\%(\K-\)\@<!\%(self\|super\)\K\@!/ containedin=tyClassBlock
 "syn keyword tySelf self contained containedin=tyClassBlock
@@ -181,6 +183,7 @@ hi link tyModName             YellowItalic
 hi link tyUse                 Include
 hi link tyIdentifier          Normal
 hi link tyField               Identifier
+hi link tyFieldType           Operator
 hi link tyModAccess           Conceal
 hi link tyBool                Boolean
 hi link tyNil                 Constant
