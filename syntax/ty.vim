@@ -26,7 +26,7 @@ syntax sync fromstart
 syntax case match
 
 syn keyword tyFunction fn function skipwhite skipempty nextgroup=tyFunctionName
-syn match   tyFunctionName contained /\%(\w\%(\w\|-\w\)*[!?=]\?[*]\=\)\|\%([/<>#~=+%?*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyFunctionTypeParams,tyParamList,@tyStatement
+syn match   tyFunctionName contained /\%(\%(::\)\?\w\%(\%(::\)\?\%(\w\|-\w\)\)*[!?=]\?[*]\=\)\|\%([/<>#~=+%?*^&!:.|-]\+\)/ skipwhite skipempty nextgroup=tyFunctionTypeParams,tyParamList,@tyStatement contains=tyModAccess
 
 syn region  tyParenthesizedExpression matchgroup=tyGroupParen start=/(/ end=/)/ transparent contains=@tyExpression
 
@@ -39,8 +39,9 @@ let ident = '\%(\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\|\$
 
 syn match   tySemicolon /;/ contained
 syn match   tyOperator /\%(#\)\|?\|\%([~<>=/%+*^&!:.|-]\)\+/
-execute "syn match   tyIdentifier /" .. ident .. "/ contains=tyModAccess,tyCall,tyType,tyCtor,tyModName"
+execute "syn match   tyIdentifier /" .. ident .. "/ contains=tyModAccess,tyCall,tyType,tyCtor,tyModName,tyLangString"
 syn match   tyCall /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?(\)\@=/ contains=tyModAccess,tyType,tyCtor nextgroup=tyArgList,tyPartialApp
+syn match   tyLangString /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?"\)\@=/ contains=tyModAccess,tyType,tyCtor nextgroup=tySpecialString
 syn match   tyModAccess contained '::'
 syn match   tyModName contained /\w\+\%(::\)\@=/
 
@@ -59,7 +60,7 @@ syn keyword tyHiding contained hiding skipwhite nextgroup=tyImportList
 syn region  tyImportList contained start=/(/ end=/)/ contains=tyIdentifier,tyAs skipwhite nextgroup=tyNewline
 syn region  tyImportStatement start=/\%(\<import\>\)\@=/ end=/\n/ contains=tyImport
 
-syn keyword tyUse use skipwhite nextgroup=tyModPath,tyType
+syn keyword tyUse use skipwhite nextgroup=tyModPath,tyType,tyMatch
 
 syn keyword tyBool true false
 syn keyword tyPub pub
@@ -103,9 +104,13 @@ syn region tyRecord contained matchgroup=tyRecordBracket start=/{/ end=/}/ conta
 syn region tyBlock contained matchgroup=tyBraces start=/{/  end=/}/  contains=@tyStatement,tyBlock extend fold
 
 syn keyword tyNil nil
-syn keyword tyKeyword with let const pub generator while for if else try catch finally throw return in not and or yield break continue macro operator static defer as namespace ns
+syn keyword tyKeyword with let const pub generator while for if else try catch finally throw return in not and or yield break continue macro operator static defer as namespace ns where
 
-execute 'syn match tyMemberAccess /\%(\%([])"' .. "'" .. '} ]\|\k\)\.\)\@<=' .. ident .. '\%(\k\|(\)\@!/'
+syn match tyMemberAccess /\%(\%([])"'} ]\|\k\)\)\@<=\./ nextgroup=tyMemberName,tyRawMemberName,tyMethodCall,tyDynamicMember,tyRawFunctionName,tyType
+syn match tyMemberName /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?/ contained
+syn match tyRawMemberName /`[^`]\+`/ contained
+syn match tyMethodCall /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?(\)\@=/ nextgroup=tyArgList,tyPartialApp contained contains=tyModAccess
+syn region tyDynamicMember matchgroup=tyMemberBracket start=/{/ end=/}/ contained contains=@tyExpression
 
 execute 'syn match tyKwArg contained /' .. ident .. '\%(:\|\s*=[=><%*]\@!\)\@=/'
 
@@ -124,7 +129,7 @@ syn region  tyCtorArgList matchgroup=tyCtorArgListParen start=/(/ end=/)/ contai
 syn match   tyComma contained /,/ skipwhite skipempty
 "syn match   tyArg contained /\%(\*\|%\)\?\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 
-syn match tyType /\K\@<![A-Z]\w*\%(\K\)\@!/ nextgroup=tyClassTypeParams
+syn match tyType /\K\@<![A-Z]\w*\%(:\@=\|\%(\K\)\@!\)/ nextgroup=tyClassTypeParams
 syn match tyCtor /\K\@<![A-Z]\w*\%(@\?(\)\@=/ nextgroup=tyCtorPartialApp,tyCtorArgList
 
 " Regular Expressions
@@ -140,7 +145,8 @@ syntax region  tyRegexpGroup        contained start="[^\\]("lc=1 skip="\\.\|\[\(
 syntax region  tyRegexpString   start=+\%(\%(\<return\|\<typeof\|\_[^)\]'"[:blank:][:alnum:]_$]\)\s*\)\@<=/\ze[^*/]+ skip=+\\.\|\[[^]]\{1,}\]+ end=+/[gimyus]\{,6}+ contains=tyRegexpCharClass,tyRegexpGroup,@tyRegexpSpecial oneline keepend extend
 syntax cluster tyRegexpSpecial    contains=tySpecial,tyRegexpBoundary,tyRegexpBackRef,tyRegexpQuantifier,tyRegexpOr,tyRegexpMod
 
-syntax region tyEscapedReservedWord start="`" end="`" oneline
+syn match tyRawIdentifier   /`[^`]\+`/             contained
+syn match tyRawFunctionName /`[^`]\+`\%(@\?(\)\@=/ contained nextgroup=tyArgList,tyPartialApp contains=tyModAccessA
 
 " Compile-time directive
 syntax region  tyDirective        start=+^\s*#|+ end=/$/ keepend
@@ -151,7 +157,7 @@ syntax region  tyComment        start=+//+ end=/$/ contains=tyCommentTodo,@Spell
 syntax region  tyComment        start=+/\*+  end=+\*/+ contains=tyCommentTodo,@Spell fold extend keepend
 syntax region  tyEnvComment     start=/\%^#!/ end=/$/ display
 
-syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyMemberAccess,tyKeyword,tyFunction,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo,tySemicolon
+syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyRawIdentifier,tyRawFunctionName,tyMemberAccess,tyKeyword,tyFunction,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo,tySemicolon
 
 syntax cluster tyStatement contains=@tyExpression,tyBlock,tyEnvComment,tyUse,tyNullStatement
 
@@ -173,7 +179,6 @@ syn match  tyDecoratorPartialApp /@/he=e+1 contained nextgroup=tyDecoratorArgLis
 syn region tyDecoratorArgList matchgroup=tyDecoratorParen start=/(/ end=/)/ contains=@tyExpression,tyComma contained
 
 
-hi link tyEscapedReservedWord Normal
 hi link tyImport              Include
 hi link tyAs                  Keyword
 hi link tyHiding              Keyword
@@ -182,6 +187,7 @@ hi link tyModAlias            YellowItalic
 hi link tyModName             YellowItalic
 hi link tyUse                 Include
 hi link tyIdentifier          Normal
+hi link tyRawIdentifier       tyIdentifier
 hi link tyField               Identifier
 hi link tyFieldType           Operator
 hi link tyModAccess           Conceal
@@ -197,6 +203,8 @@ hi link tyMethodName          Function
 hi link tyFunction            Keyword
 hi link tyFunctionName        Function
 hi link tyCall                Function
+hi link tyMethodCall          Function
+hi link tyRawFunctionName     Function
 hi link tyLet                 StorageClass
 hi link tyKeyword             Keyword
 hi link tyDo                  Keyword
@@ -210,12 +218,15 @@ hi link tyParam               Special
 hi link tyOperator            Operator
 hi link tyNotNil              Special
 hi link tyInstanceVar         Identifier
-hi link tyMemberAccess        Identifier
+hi link tyMemberAccess        Operator
+hi link tyMemberName          Identifier
+hi link tyRawMemberName       Identifier
 hi link tyPartialApp          Macro
 hi link tyCtorPartialApp      Macro
 hi link tySelf                Constant
 hi link tyString              String
 hi link tySpecialString       String
+hi link tyLangString          PreProc
 hi link tyDocString           String
 hi link tyDocSpecialString    String
 hi link tySpecial             Special
