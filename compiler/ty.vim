@@ -1,5 +1,5 @@
 " Vim compiler file
-" Compiler: Hare Compiler
+" Compiler: Ty Compiler
 
 if exists("g:current_compiler")
   finish
