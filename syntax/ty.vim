@@ -38,7 +38,7 @@ syn match  tyQQSpliceVar /\$\$\K\k*/
 let ident = '\%(\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\|\$\d\+\)'
 
 syn match   tySemicolon /;/ contained
-syn match   tyOperator /\%(#\)\|?\|\%([~<>=/%+*^&!:.|-]\)\+/
+syn match   tyOperator /\%(#\)\|?\|\%([~<>=@/%+*^&!:.|-]\)\+/
 execute "syn match   tyIdentifier /" .. ident .. "/ contains=tyModAccess,tyCall,tyType,tyCtor,tyModName,tyLangString"
 syn match   tyCall /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?(\)\@=/ contains=tyModAccess,tyType,tyCtor nextgroup=tyArgList,tyPartialApp
 syn match   tyLangString /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?\%(@\?"\)\@=/ contains=tyModAccess,tyType,tyCtor nextgroup=tySpecialString
@@ -170,7 +170,7 @@ syntax match   tyNumber           /\c\%(\<\|[!?]\@<=\)-\=\%(\d[0-9_]*\%(e[+-]\=\
 syntax region  tyDocString           start=+\z('''\+\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial extend
 syntax region  tyDocSpecialString    start=+\z("""\+\)+  skip=+\\\%(\z1\|$\)+  end=+\z1+ contains=tySpecial,tyTemplateExpression extend
 
-syn region tyDecorator      matchgroup=tyDecoratorSymbol start=/@/ end=/$/ contains=tyDecoratorName,@tyExpression extend
+syn region tyDecorator      matchgroup=tyDecoratorSymbol start=/@\w\@=/ end=/$/ contains=tyDecoratorName,@tyExpression extend
 syn region tyDecoratorMacro matchgroup=tyDecoratorMacroBracket start=/@{/  end=/}/  contains=tyDecoratorMacroName,@tyExpression extend
 
 syn match  tyDecoratorName /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?/ contained contains=tyModAccess nextgroup=tyDecoratorArgList,tyDecoratorPartialApp
