@@ -19,7 +19,7 @@ else
   setlocal iskeyword+=?
 endif
 
-syntax sync fromstart
+syntax sync minlines=500
 
 " TODO: Figure out what type of casing I need
 " syntax case ignore
@@ -47,8 +47,9 @@ syn match   tyModName contained /\w\+\%(::\)\@=/
 
 syn region  tyArray matchgroup=tyArrayBracket start=/\[/ end=/]/ transparent
 syn region  tyDict matchgroup=tyDictBracket start=/%{/ end=/}/ transparent
+syn match   tyDictDefault /\*\s*:/ containedin=tyDict
 
-syn match tyNotNil /\$[A-z_]\@=/ contained nextgroup=tyIdentifier
+syn match tyNotNil /\$[A-Za-z_]\@=/ contained nextgroup=tyIdentifier
 
 " Modules
 syn match   tyNewline contained /\n\|$/
@@ -95,7 +96,7 @@ syn match   tyParam contained /\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgr
 syn match   tyGatherParam contained /\*\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 syn match   tyKwargsParam contained /%\w\%(\w\|-\w\)*[!?]\?/ skipwhite skipempty nextgroup=tyParamConstraint,tyComma
 "syn region  tyParamConstraint contained start=':' end=/,\|)\|\%(=\@=\)/ contains=@tyExpression skipwhite skipempty nextgroup=tyParamDefault,tyComma
-syn match tyParamConstraint contained /:/ skipwhite nextgroup=@tyExpresion
+syn match tyParamConstraint contained /:/ skipwhite nextgroup=@tyExpression
 "syn region  tyParamDefault contained start='=' end=/{\|,/ skipwhite skipempty contains=@tyExpression
 syn match tyParamDefault contained /=/ skipwhite nextgroup=@tyExpression
 syn region tyReturnType start=/->/ end=/\%({\|;\)\@=/ skipwhite skipempty transparent contains=@tyExpression nextgroup=@tyStatement
@@ -142,11 +143,11 @@ syntax match   tyRegexpQuantifier   contained "\v[^\\]%([?*+]|\{\d+%(,\d*)?})\??
 syntax match   tyRegexpOr           contained "|"
 syntax match   tyRegexpMod          contained "\v\(\?[:=!>]"lc=1
 syntax region  tyRegexpGroup        contained start="[^\\]("lc=1 skip="\\.\|\[\(\\.\|[^]]\+\)\]" end=")" contains=tyRegexpCharClass,@tyRegexpSpecial keepend
-syntax region  tyRegexpString   start=+\%(\%(\<return\|\<typeof\|\_[^)\]'"[:blank:][:alnum:]_$]\)\s*\)\@<=/\ze[^*/]+ skip=+\\.\|\[[^]]\{1,}\]+ end=+/[gimyus]\{,6}+ contains=tyRegexpCharClass,tyRegexpGroup,@tyRegexpSpecial oneline keepend extend
+syntax region  tyRegexpString   start=+\%(\%(\<return\|\<yield\|\<throw\|\<not\|\<and\|\<or\|\_[^)\]}"'[:blank:][:alnum:]_$!?]\)\s*\)\@<=/\ze[^*/]+ skip=+\\.\|\[[^]]\{1,}\]+ end=+/[gimyus]\{,6}+ contains=tyRegexpCharClass,tyRegexpGroup,@tyRegexpSpecial oneline keepend extend
 syntax cluster tyRegexpSpecial    contains=tySpecial,tyRegexpBoundary,tyRegexpBackRef,tyRegexpQuantifier,tyRegexpOr,tyRegexpMod
 
 syn match tyRawIdentifier   /`[^`]\+`/             contained
-syn match tyRawFunctionName /`[^`]\+`\%(@\?(\)\@=/ contained nextgroup=tyArgList,tyPartialApp contains=tyModAccessA
+syn match tyRawFunctionName /`[^`]\+`\%(@\?(\)\@=/ contained nextgroup=tyArgList,tyPartialApp contains=tyModAccess
 
 " Compile-time directive
 syntax region  tyDirective        start=+^\s*#|+ end=/$/ keepend
@@ -157,7 +158,7 @@ syntax region  tyComment        start=+//+ end=/$/ contains=tyCommentTodo,@Spell
 syntax region  tyComment        start=+/\*+  end=+\*/+ contains=tyCommentTodo,@Spell fold extend keepend
 syntax region  tyEnvComment     start=/\%^#!/ end=/$/ display
 
-syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyRawIdentifier,tyRawFunctionName,tyMemberAccess,tyKeyword,tyFunction,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo,tySemicolon
+syntax cluster tyExpression contains=tyBool,tyNumber,tyIdentifier,tyRawIdentifier,tyRawFunctionName,tyMemberAccess,tyKeyword,tyFunction,tyNil,tyOperator,tyInstanceVar,tySelf,tyCall,tySpecialString,tyString,tyType,tyCtor,tyRegexpString,tyDirective,tyComment,tyNotNil,tyDecoratorMacro,tyDecorator,tyParenthesizedExpression,tyQuasiQuoted,tyQQSpliceVar,tyQQSpliceVal,tyQQSpliceExpr,tyArray,tyDict,tyMatch,tyRecord,tyDo,tySemicolon,tyTyxTag,tyTyxCloseTag
 
 syntax cluster tyStatement contains=@tyExpression,tyBlock,tyEnvComment,tyUse,tyNullStatement
 
@@ -177,6 +178,16 @@ syn match  tyDecoratorName /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\
 syn match  tyDecoratorMacroName /\%(\d\)\@!\%(::\)\?\w\%(\w\|-\w\)*\%(::\K\%(\w|-\)*\)*[!?]\?/ contained contains=tyModAccess nextgroup=tyDecoratorArgList,tyDecoratorPartialApp
 syn match  tyDecoratorPartialApp /@/he=e+1 contained nextgroup=tyDecoratorArgList
 syn region tyDecoratorArgList matchgroup=tyDecoratorParen start=/(/ end=/)/ contains=@tyExpression,tyComma contained
+
+" TYX (JSX-like) syntax
+syn region  tyTyxTag           matchgroup=tyTyxBracket start=+<\ze[A-Z]+ end=+/>+ end=+>+ contains=tyTyxTagName,tyTyxAttr,tyTyxAttrExpr,tyString,tySpecialString,tyNumber,tyBool,tyComment
+syn match   tyTyxAttr          /[a-zA-Z_]\%(\w\|-\w\)*\ze\s*[=/>]/ contained
+syn match   tyTyxAttr          /[a-zA-Z_]\%(\w\|-\w\)*\ze\s\+[a-zA-Z_]/ contained
+syn match   tyTyxTagName       /[A-Z]\w*/ contained
+syn match   tyTyxAttrEq        /=/ contained containedin=tyTyxTag
+syn region  tyTyxAttrExpr      matchgroup=tyTyxAttrExprParen start=+(+ end=+)+ contained contains=@tyExpression
+syn region  tyTyxCloseTag      matchgroup=tyTyxCloseBracket start=+</\ze[A-Z]+ end=+>+ contains=tyTyxCloseTagName
+syn match   tyTyxCloseTagName  /[A-Z]\w*/ contained
 
 
 hi link tyImport              Include
@@ -256,6 +267,15 @@ hi link tyDecoratorMacroName    Macro
 hi link tyDecoratorParen        Macro
 hi link tyDecorator             Number
 
+hi link tyDictDefault         Special
+
+hi link tyTyxBracket          Special
+hi link tyTyxCloseBracket     Special
+hi link tyTyxTagName          Type
+hi link tyTyxCloseTagName     Type
+hi link tyTyxAttr             Identifier
+hi link tyTyxAttrEq           Operator
+hi link tyTyxAttrExprParen    Special
 hi link tyArgListParen     Normal
 hi link tyCtorArgListParen Type
 hi link tyGroupParen       Normal
